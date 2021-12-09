@@ -20,10 +20,9 @@ jobs:
           name: linux
           path: build/linux/x64/release/bundle
       - name: Upload Release
-        uses: actions/upload-artifact@v2
+        uses: ncipollo/release-action@v1
         with:
-          name: AppRelease
-          path: build/linux/x64/release/bundle
+          artifacts: build/linux/x64/release/bundle
   # windows:
   #   runs-on: windows-latest
   #   steps:
