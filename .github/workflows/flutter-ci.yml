@@ -19,11 +19,7 @@ jobs:
         with:
           name: linux
           path: build/linux/x64/release/bundle
-      - name: Upload Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: build/linux/x64/release/bundle
-          token: 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
+
   # windows:
   #   runs-on: windows-latest
   #   steps:
