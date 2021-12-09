@@ -6,16 +6,19 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     steps:
+      - run: |
+          cd ../
+          mkdir build
+          cd build
+          cmake -G Ninja ..
+      - run: cmake --build build
+      - run: cd /home/runner/work/uiv2/uiv2
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
         with:
           channel: beta
       - uses: seanmiddleditch/gha-setup-ninja@master
-      - run: |
-          mkdir build
-          cd build
-          cmake -G Ninja ..
-      - run: cmake --build build
+
       - run: flutter config --enable-linux-desktop
       - run: flutter build linux --no-sound-null-safety
 
