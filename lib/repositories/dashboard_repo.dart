@@ -68,6 +68,24 @@ class DashboardRepository {
     }
   }
 
+  Future<List<RecentOrder>> getOrdersByDateRange(
+      String startDate, endDate) async {
+    try {
+      final result = await dio.get(
+        orderUrl + "/all" + "?start_date=" + startDate + "&end_date=" + endDate,
+      );
+
+      List<RecentOrder> recentOrders = [];
+      for (dynamic d in result.data["message"]) {
+        recentOrders.add(RecentOrder.fromJson(d));
+      }
+      return recentOrders;
+    } catch (e) {
+      print(e);
+      throw Exception(e);
+    }
+  }
+
   Future<int?> createProduct(var p) async {
     try {
       final result = await dio.post(

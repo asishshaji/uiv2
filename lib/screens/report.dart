@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:uiv2/constants.dart';
 import 'package:uiv2/models/dashboard.dart';
+import 'package:uiv2/models/recentorders.dart';
 import 'package:uiv2/repositories/dashboard_repo.dart';
 import 'package:uiv2/widgets/dashboard_card.dart';
 
@@ -14,23 +16,26 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  late DateTime startDate;
-  late DateTime endDate;
+  DateTime? startDate;
+  DateTime? endDate;
 
   DashboardRepository dashboardRepository = DashboardRepository();
   Dashboard? dashboard;
+  List<RecentOrder> recentOrders = [];
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
     startDate = args.value.startDate;
     endDate = args.value.endDate;
 
-    // yyyy-MM-dd
-
     DateFormat formatter = DateFormat('yyyy-MM-dd');
+    if (startDate != null && endDate != null) {
+      dashboard = await dashboardRepository.getDashboardData(
+          formatter.format(startDate!), formatter.format(endDate!));
+      recentOrders = await dashboardRepository.getOrdersByDateRange(
+          formatter.format(startDate!), formatter.format(endDate!));
 
-    dashboard = await dashboardRepository.getDashboardData(
-        formatter.format(startDate), formatter.format(endDate));
-    setState(() {});
+      setState(() {});
+    }
   }
 
   @override
@@ -111,10 +116,52 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ),
             Expanded(
-                child: Container(
+                child: SizedBox(
               width: width,
-              color: Colors.red,
-              child: Text("ASDSD"),
+              child: recentOrders.isEmpty
+                  ? const Center(
+                      child: Text("ഈ തീയതിയിൽ ഡാറ്റയില",
+                          style: TextStyle(
+                              fontFamily: "Mal", fontWeight: FontWeight.bold)),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 100),
+                      child: DataTable(
+                        columns: const [
+                          DataColumn(
+                              label: Text(
+                            "ഐഡി",
+                            style: TextStyle(
+                                fontFamily: "Mal", fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text("ഫോൺ നമ്പർ",
+                                  style: TextStyle(
+                                      fontFamily: "Mal",
+                                      fontWeight: FontWeight.bold))),
+                          DataColumn(
+                              label: Text("ലാഭം",
+                                  style: TextStyle(
+                                      fontFamily: "Mal",
+                                      fontWeight: FontWeight.bold))),
+                        ],
+                        rows: recentOrders
+                            .map((e) => DataRow(cells: [
+                                  DataCell(
+                                    Text(e.order_id.toString()),
+                                  ),
+                                  DataCell(
+                                    Text(e.phone_number.toString()),
+                                  ),
+                                  DataCell(
+                                    Text(Constants.currency +
+                                        " " +
+                                        e.profit.toString()),
+                                  ),
+                                ]))
+                            .toList(),
+                      ),
+                    ),
             ))
           ],
         ));
