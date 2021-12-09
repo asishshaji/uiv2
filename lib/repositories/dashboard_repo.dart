@@ -10,14 +10,8 @@ class DashboardRepository {
   final productUrl = "http://0.0.0.0:9090/product";
   final orderUrl = "http://0.0.0.0:9090/order";
 
-  Future<Dashboard> getDashboardData() async {
-    final DateTime now = DateTime.now();
-
-    final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final String todayFormatted = formatter.format(now);
-    final DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
-    final String tomorrowFormatted = formatter.format(tomorrow);
-
+  Future<Dashboard> getDashboardData(
+      String todayFormatted, String tomorrowFormatted) async {
     try {
       final result = await dio.get(dashboardUrl +
           "?start_date=" +
@@ -80,7 +74,7 @@ class DashboardRepository {
         productUrl,
         data: p,
       );
-
+      print(result);
       return result.statusCode;
     } catch (e) {}
   }
@@ -91,7 +85,7 @@ class DashboardRepository {
         productUrl,
         data: p,
       );
-
+      print(result);
       return result.statusCode;
     } catch (e) {}
   }

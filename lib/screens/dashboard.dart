@@ -1,4 +1,3 @@
-import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:uiv2/constants.dart';
 import 'package:uiv2/screens/order.dart';
+import 'package:uiv2/screens/report.dart';
+import 'package:uiv2/screens/stock.dart';
 import 'package:uiv2/state/dashboard/dashboard_provider.dart';
 import 'package:uiv2/widgets/stats.dart';
 
@@ -23,21 +24,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton: SizedBox(
-        height: 65.0,
-        width: 65.0,
-        child: FittedBox(
-          child: FloatingActionButton(
-            backgroundColor: Colors.black,
-            child: const Icon(FontAwesomeIcons.receipt),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const OrderScreen()));
-            },
-          ),
-        ),
-      ),
+      floatingActionButton: const dashboardFabs(),
       appBar: appBar(now),
       body: Row(
         children: [
@@ -48,42 +35,37 @@ class DashboardScreen extends ConsumerWidget {
                   height: 20,
                 ),
                 rowStats(),
-                const Expanded(
-                  flex: 1,
-                  child: SizedBox(),
-                ),
                 Align(
                   alignment: Alignment.topLeft,
                   child: Container(
-                    margin: const EdgeInsets.only(left: 82, bottom: 20),
+                    margin: const EdgeInsets.only(left: 20, bottom: 20),
                     child: const Text(
                       "വിൽപ്പന ഗ്രാഫ്",
                       style: TextStyle(
                         fontFamily: "Mal",
-                        fontSize: 30,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 2,
                   child: Container(
+                    width: screenWidth,
                     decoration: const BoxDecoration(
                         color: Color(0xff2c4260),
                         borderRadius: BorderRadius.all(Radius.circular(20))),
-                    margin: const EdgeInsets.only(bottom: 80),
-                    width: screenWidth / 1.5,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 100, vertical: 5),
-                      child: Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        child: const GraphWidget2(),
-                        color: const Color(0xff2c4260),
-                      ),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child: Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: const GraphWidget2(),
+                      color: const Color(0xff2c4260),
                     ),
                   ),
                 ),
@@ -96,8 +78,11 @@ class DashboardScreen extends ConsumerWidget {
               ],
             ),
           ),
-          SizedBox(
+          Container(
             width: screenWidth / 4,
+            padding: const EdgeInsets.only(
+              right: 10,
+            ),
             child: Column(
               children: [
                 const SizedBox(
@@ -107,7 +92,7 @@ class DashboardScreen extends ConsumerWidget {
                   "ലാഭം",
                   style: TextStyle(
                     fontFamily: "Mal",
-                    fontSize: 30,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -131,7 +116,7 @@ class DashboardScreen extends ConsumerWidget {
                   "അടുത്തിടെ വിറ്റതു",
                   style: TextStyle(
                     fontFamily: "Mal",
-                    fontSize: 30,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -163,15 +148,12 @@ class DashboardScreen extends ConsumerWidget {
       title: Padding(
         padding: const EdgeInsets.only(
           top: 20,
-          left: 80,
+          left: 20,
         ),
-        child: Text(
-          "Dashboard",
-          style: GoogleFonts.dmSans(
-            fontSize: 30,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+        child: Image.asset(
+          "logo.png",
+          height: 140,
+          width: 140,
         ),
       ),
       actions: [
@@ -191,29 +173,14 @@ class DashboardScreen extends ConsumerWidget {
             child: Text(
               DateFormat.yMMMMd('en_US').format(now),
               style: GoogleFonts.dmSans(
-                fontSize: 16,
                 color: Colors.black,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ),
         const SizedBox(
           width: 20,
-        ),
-        Container(
-          margin: const EdgeInsets.only(
-            top: 8,
-          ),
-          child: CircularProfileAvatar(
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf8kOwIhJJkqgqdTIzdm3XFiAxg3ccsjpCGbk6-dtZ38CudFYYkZhQYzQ8voR0Frq76Tw&usqp=CAU",
-            backgroundColor: Colors.white,
-            elevation: 5,
-            radius: 30,
-          ),
-        ),
-        const SizedBox(
-          width: 40,
         ),
       ],
     );
@@ -224,6 +191,95 @@ class DashboardScreen extends ConsumerWidget {
       children: const [
         Stats(),
         SizedBox(height: 50),
+      ],
+    );
+  }
+}
+
+class dashboardFabs extends StatelessWidget {
+  const dashboardFabs({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(
+          width: 40,
+        ),
+        SizedBox(
+          height: 50,
+          child: FloatingActionButton.extended(
+            heroTag: "btn1",
+            label: const Text(
+              "റിപ്പോർട്ട്",
+              style: TextStyle(
+                fontFamily: "Mal",
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            backgroundColor: Colors.black,
+            icon: const Icon(FontAwesomeIcons.receipt),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ReportScreen()));
+            },
+          ),
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+        SizedBox(
+          height: 50,
+          child: FloatingActionButton.extended(
+            heroTag: "btn3",
+            label: const Text(
+              "സ്റ്റോക്ക്",
+              style: TextStyle(
+                fontFamily: "Mal",
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            backgroundColor: Colors.black,
+            icon: const Icon(FontAwesomeIcons.receipt),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StockScreen(),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+        SizedBox(
+          height: 50,
+          child: FloatingActionButton.extended(
+            heroTag: "btn2",
+            label: const Text(
+              "ബില്ലിംഗ്",
+              style: TextStyle(
+                fontFamily: "Mal",
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            backgroundColor: Colors.black,
+            icon: const Icon(FontAwesomeIcons.receipt),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const OrderScreen()));
+            },
+          ),
+        ),
       ],
     );
   }
@@ -262,6 +318,7 @@ class RecentOrdersWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final DateFormat formatter = DateFormat('MMMEd');
+    final DateFormat timeFormat = DateFormat.jm();
     final state = ref.watch(dashboardNotifierProvider);
 
     return state.when(
@@ -275,22 +332,32 @@ class RecentOrdersWidget extends ConsumerWidget {
               itemBuilder: (context, idx) => ListTile(
                 title: Text(
                   r[idx].phone_number,
-                  style: GoogleFonts.dmSans(
+                  style: GoogleFonts.openSans(
                     color: Colors.black,
-                    fontSize: 16,
                   ),
                 ),
                 subtitle: Text(
                   Constants.currency + " " + r[idx].profit.toString(),
-                  style: GoogleFonts.dmSans(
+                  style: GoogleFonts.openSans(
                     color: Colors.black,
                   ),
                 ),
-                trailing: Text(
-                  formatter.format(DateTime.parse(r[idx].created_at)),
-                  style: GoogleFonts.dmSans(
-                    color: Colors.black,
-                  ),
+                trailing: Column(
+                  children: [
+                    Text(
+                      formatter.format(DateTime.parse(r[idx].created_at)),
+                      style: GoogleFonts.openSans(
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      timeFormat
+                          .format(DateTime.parse(r[idx].created_at).toLocal()),
+                      style: GoogleFonts.openSans(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               itemCount: r.length,
@@ -306,7 +373,7 @@ class GraphWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final DateFormat formatter = DateFormat('E, d');
+    final DateFormat formatter = DateFormat('E');
     final state = ref.watch(dashboardNotifierProvider);
 
     return state.when(
@@ -325,9 +392,7 @@ class GraphWidget extends ConsumerWidget {
               getTextStyles: (context, value) => const TextStyle(
                 color: Color(0xff7589a2),
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
               ),
-              margin: 20,
               getTitles: (double value) {
                 return formatter.format(DateTime.parse(e.dates[value.toInt()]));
               },
@@ -353,13 +418,15 @@ class GraphWidget extends ConsumerWidget {
                   ))
               .toList(),
           alignment: BarChartAlignment.spaceAround,
-          maxY: 4000,
+          maxY: 6000,
         ),
       ),
       error: (error) => Center(
         child: Text(
           error.toString(),
-          style: GoogleFonts.dmSans(color: Colors.white, fontSize: 18),
+          style: GoogleFonts.dmSans(
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -392,7 +459,6 @@ class GraphWidget2 extends ConsumerWidget {
               getTextStyles: (context, value) => const TextStyle(
                 color: Color(0xff7589a2),
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
               ),
               margin: 20,
               getTitles: (double value) {
@@ -420,13 +486,13 @@ class GraphWidget2 extends ConsumerWidget {
                   ))
               .toList(),
           alignment: BarChartAlignment.spaceAround,
-          maxY: 10000,
+          maxY: 15000,
         ),
       ),
       error: (error) => Center(
         child: Text(
           error.toString(),
-          style: GoogleFonts.dmSans(color: Colors.white, fontSize: 20),
+          style: GoogleFonts.dmSans(color: Colors.white),
         ),
       ),
     );

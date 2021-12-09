@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: flutter/flutter
+          ref: master
+      - name: Add Flutter to path
+        run: echo "::add-path::$GITHUB_WORKSPACE/flutter/bin"
+      - name: Enable windows support
+        run: flutter config --enable-windows-desktop
+      - name: Enable linux support
+        run: flutter config --enable-linux-desktop
+
+      - name: Build example debug
+        run: |
+          flutter packages get	
+          flutter build -v windows --relase

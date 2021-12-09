@@ -18,7 +18,7 @@ class DashboardGradientCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(top: 15),
-      height: 250,
+      height: 180,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -26,8 +26,8 @@ class DashboardGradientCard extends StatelessWidget {
         semanticContainer: true,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         child: Container(
-          height: 220,
-          width: 250,
+          height: 180,
+          width: 180,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: colors,
@@ -40,8 +40,8 @@ class DashboardGradientCard extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.only(left: 10),
-                height: 140,
-                width: 200,
+                height: 100,
+                width: 180,
                 alignment: Alignment.centerLeft,
                 child: FaIcon(
                   icon,
@@ -51,7 +51,7 @@ class DashboardGradientCard extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                  width: 200,
+                  width: 180,
                   padding: const EdgeInsets.only(
                     left: 10,
                   ),
@@ -63,7 +63,6 @@ class DashboardGradientCard extends StatelessWidget {
                         title,
                         style: GoogleFonts.dmSans(
                           color: Colors.white,
-                          fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -74,7 +73,6 @@ class DashboardGradientCard extends StatelessWidget {
                         desc,
                         style: const TextStyle(
                           fontFamily: "Mal",
-                          fontSize: 22,
                           color: Colors.white,
                         ),
                       ),

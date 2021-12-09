@@ -11,7 +11,15 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
   Future<void> getDashboardData() async {
     state = const DashboardState.loading();
     try {
-      final dashboard = await _dashboardRepository.getDashboardData();
+      final DateTime now = DateTime.now();
+
+      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
+      final String todayFormatted = formatter.format(now);
+      final DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
+      final String tomorrowFormatted = formatter.format(tomorrow);
+      final dashboard = await _dashboardRepository.getDashboardData(
+          todayFormatted, tomorrowFormatted);
       final salesData = await _dashboardRepository.getSalesProfitData();
       final recentOrders = await _dashboardRepository.getRecentOrders();
       state = DashboardState.data(

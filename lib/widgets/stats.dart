@@ -21,7 +21,7 @@ class Stats extends ConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       data: (data, salesData, recentOrders) => Padding(
-        padding: const EdgeInsets.only(left: 80.0),
+        padding: const EdgeInsets.only(left: 20.0),
         child: Row(
           children: [
             DashboardGradientCard(
@@ -34,7 +34,7 @@ class Stats extends ConsumerWidget {
               ],
             ),
             const SizedBox(
-              width: 50,
+              width: 10,
             ),
             DashboardGradientCard(
               title: Constants.currency + " " + data.profit.toString(),
@@ -46,7 +46,7 @@ class Stats extends ConsumerWidget {
               ],
             ),
             const SizedBox(
-              width: 50,
+              width: 10,
             ),
             DashboardGradientCard(
               title: Constants.currency + " " + data.sales.toString(),
@@ -58,7 +58,7 @@ class Stats extends ConsumerWidget {
               ],
             ),
             const SizedBox(
-              width: 50,
+              width: 10,
             ),
           ],
         ),

@@ -1,8 +1,8 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:toast/toast.dart';
 import 'package:uiv2/constants.dart';
 import 'package:uiv2/models/order.dart';
@@ -10,6 +10,7 @@ import 'package:uiv2/models/orderitem.dart';
 import 'package:uiv2/models/product.dart';
 import 'package:uiv2/repositories/order_repo.dart';
 import 'package:uiv2/repositories/product_repo.dart';
+import 'package:uiv2/state/dashboard/dashboard_provider.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _OrderScreenState extends State<OrderScreen> {
     });
   }
 
-  Map<int?, double?> orderItems = Map();
+  Map<int?, double?> orderItems = {};
   String phoneNumber = "";
   double totalCost = 0;
   OrderRepository orderRepository = OrderRepository();
@@ -45,204 +46,304 @@ class _OrderScreenState extends State<OrderScreen> {
     getProducts();
   }
 
+  updateTotalCost() {
+    totalCost = 0;
+    orderItems.forEach((k, v) {
+      totalCost +=
+          products.where((element) => element.id == k).first.sell_price! * v!;
+    });
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            List<OrderItem> oItems = List.empty(growable: true);
-            orderItems.forEach((key, value) {
-              oItems.add(OrderItem(p_id: key!, units: value!));
-            });
-            Order o = Order(order_items: oItems, phone_number: phoneNumber);
-            String errorMessage =
-                await orderRepository.createOrderAndPrintReceipt(o);
-            if (errorMessage.isEmpty) {
-              orderRepository.printReceipt(
-                  phoneNumber, selectedProducts, o, totalCost);
-              Toast.show(Constants.printingMsg, context);
-            } else {
-              Toast.show(errorMessage, context);
-            }
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                Constants.snackBarMsg,
-                style: const TextStyle(fontFamily: "Mal"),
-              ),
+      floatingActionButton: SizedBox(
+        height: 50.0,
+        child: FloatingActionButton.extended(
+          label: const Text(
+            "പ്രിന്റ്",
+            style: TextStyle(
+              fontFamily: "Mal",
             ),
-          );
-        },
+          ),
+          backgroundColor: Colors.black,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          icon: const Icon(FontAwesomeIcons.print),
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              List<OrderItem> oItems = List.empty(growable: true);
+              orderItems.forEach((key, value) {
+                oItems.add(OrderItem(p_id: key!, units: value!));
+              });
+              Order o = Order(order_items: oItems, phone_number: phoneNumber);
+              String errorMessage =
+                  await orderRepository.createOrderAndPrintReceipt(o);
+              if (errorMessage.isEmpty) {
+                orderRepository.printReceipt(
+                    phoneNumber, selectedProducts, o, totalCost);
+                Toast.show(Constants.printingMsg, context);
+              } else {
+                Toast.show(errorMessage, context);
+              }
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  Constants.snackBarMsg,
+                  style: const TextStyle(fontFamily: "Mal"),
+                ),
+              ),
+            );
+          },
+        ),
       ),
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            FontAwesomeIcons.arrowLeft,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
+        leading: Consumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            return IconButton(
+              enableFeedback: false,
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                ref.read(dashboardNotifierProvider.notifier).getDashboardData();
+                Navigator.pop(context);
+              },
+            );
           },
         ),
         elevation: 0,
         centerTitle: true,
         backgroundColor: Colors.white,
-        title: const Text(
-          "പ്രിന്റ് രസീത്",
-          style: TextStyle(
-            fontFamily: "Mal",
-            color: Colors.black,
-            fontSize: 30,
-            fontWeight: FontWeight.w500,
+        title: Container(
+          margin: const EdgeInsets.only(top: 20),
+          child: const Text(
+            "പ്രിന്റ് രസീത്",
+            style: TextStyle(
+              fontFamily: "Mal",
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),
-      body: Container(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.only(
-          top: 50,
-          left: 100,
-          right: 100,
+          bottom: 120,
         ),
-        child: Center(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'ഫോൺ നമ്പർ ',
-                    labelText: 'ഫോൺ നമ്പർ  *',
-                    hintStyle: TextStyle(fontFamily: "Mal", fontSize: 20),
-                    labelStyle: TextStyle(fontFamily: "Mal", fontSize: 18),
+        child: Container(
+          padding: const EdgeInsets.only(
+            top: 80,
+            left: 100,
+            right: 100,
+          ),
+          child: Center(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.person),
+                      hintText: 'ഫോൺ നമ്പർ ',
+                      labelText: 'ഫോൺ നമ്പർ  *',
+                      hintStyle: TextStyle(fontFamily: "Mal"),
+                      labelStyle: TextStyle(fontFamily: "Mal"),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'ഉപഭോക്താവിന്റെ ഫോൺ നമ്പർ നൽകുക';
+                      }
+                      return null;
+                    },
+                    onChanged: (val) {
+                      phoneNumber = val;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'ഉപഭോക്താവിന്റെ ഫോൺ നമ്പർ നൽകുക';
-                    }
-                    return null;
-                  },
-                  onChanged: (val) {
-                    phoneNumber = val;
-                  },
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                Align(alignment: Alignment.topRight, child: addButton(context)),
-                const SizedBox(
-                  height: 50,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(
-                          label: Text('ഐഡി',
-                              style: TextStyle(
-                                  fontSize: 20.0, fontFamily: "Mal"))),
-                      DataColumn(
-                          label: Text('ഉത്പന്നത്തിന്റെ പേര്',
-                              style: TextStyle(
-                                  fontSize: 20.0, fontFamily: "Mal"))),
-                      DataColumn(
-                          label: Text('വില',
-                              style: TextStyle(
-                                  fontSize: 20.0, fontFamily: "Mal"))),
-                      DataColumn(
-                          label: Text('അളവ്‌',
-                              style: TextStyle(
-                                  fontSize: 20.0, fontFamily: "Mal"))),
-                      DataColumn(
-                          label: Text('',
-                              style:
-                                  TextStyle(fontSize: 20.0, fontFamily: "Mal")))
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Align(
+                      alignment: Alignment.topRight, child: addButton(context)),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: screenWidth / 5,
+                        child: const Text(
+                          "ഐഡി",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Mal",
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth / 5,
+                        child: const Text(
+                          "ഉൽപ്പന്നം",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Mal",
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth / 5,
+                        child: const Text(
+                          "വില",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Mal",
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth / 5,
+                        child: const Text(
+                          "യൂണിറ്റുകൾ",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Mal",
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
-                    rows: selectedProducts
-                        .map((e) => DataRow(cells: [
-                              DataCell(Text(e.id.toString())),
-                              DataCell(Text(e.name.toString())),
-                              DataCell(Text(Constants.currency +
-                                  " " +
-                                  e.sell_price.toString())),
-                              DataCell(TextField(
-                                keyboardType: e.type.toString() == "R"
-                                    ? TextInputType.number
-                                    : const TextInputType.numberWithOptions(
-                                        decimal: false),
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 20), // add padding to adjust text
-                                    hintText: e.type.toString() == "P"
-                                        ? "Packets"
-                                        : "Kg"),
-                                onChanged: (v) {
-                                  if (orderItems.containsKey(e.id)) {
-                                    orderItems.update(
-                                        e.id,
-                                        (value) =>
-                                            v == "" ? 0 : double.parse(v));
-                                  } else {
-                                    orderItems.putIfAbsent(e.id,
-                                        () => v == "" ? 0 : double.parse(v));
-                                  }
+                  ),
+                  SizedBox(
+                    width: screenWidth,
+                    child: ListView.builder(
+                        key: Key(selectedProducts.length.toString()),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: selectedProducts.length,
+                        itemBuilder: (ctx, idx) {
+                          Product e = selectedProducts[idx];
+                          double? initialVal = orderItems[e.id];
+                          initialVal ??= 0;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              SizedBox(
+                                child: Text(
+                                  e.id.toString(),
+                                  textAlign: TextAlign.center,
+                                ),
+                                width: screenWidth / 5,
+                              ),
+                              SizedBox(
+                                child: Text(
+                                  e.name.toString() +
+                                      " (" +
+                                      (e.type.toString() == "P"
+                                          ? "Packets"
+                                          : "Kg") +
+                                      ")",
+                                  textAlign: TextAlign.center,
+                                ),
+                                width: screenWidth / 5,
+                              ),
+                              SizedBox(
+                                width: screenWidth / 5,
+                                child: Text(
+                                  Constants.currency +
+                                      " " +
+                                      e.sell_price.toString(),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              SizedBox(
+                                width: screenWidth / 5,
+                                child: TextFormField(
+                                  textAlign: TextAlign.center,
+                                  initialValue: initialVal.toString(),
+                                  keyboardType: e.type.toString() == "R"
+                                      ? TextInputType.number
+                                      : const TextInputType.numberWithOptions(
+                                          decimal: false),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      contentPadding: const EdgeInsets.only(
+                                          top:
+                                              20), // add padding to adjust text
+                                      hintText: e.type.toString() == "P"
+                                          ? "Packets"
+                                          : "Kg"),
+                                  onChanged: (v) {
+                                    if (orderItems.containsKey(e.id)) {
+                                      orderItems.update(
+                                          e.id,
+                                          (value) =>
+                                              v == "" ? 0 : double.parse(v));
+                                    } else {
+                                      orderItems.putIfAbsent(e.id,
+                                          () => v == "" ? 0 : double.parse(v));
+                                    }
 
-                                  totalCost = 0;
-                                  orderItems.forEach((k, v) {
-                                    totalCost += products
-                                            .where((element) => element.id == k)
-                                            .first
-                                            .sell_price! *
-                                        v!;
-                                  });
-
-                                  setState(() {});
-                                },
-                              )),
-                              DataCell(IconButton(
+                                    updateTotalCost();
+                                  },
+                                ),
+                              ),
+                              IconButton(
                                 icon: const Icon(
                                   FontAwesomeIcons.trash,
                                   color: Colors.red,
                                 ),
                                 onPressed: () {
                                   selectedProducts.remove(e);
-                                  setState(() {});
+                                  orderItems.removeWhere((k, v) => k == e.id);
+                                  updateTotalCost();
                                 },
-                              )),
-                            ]))
-                        .toList(),
+                              ),
+                            ],
+                          );
+                        }),
                   ),
-                ),
-                const SizedBox(
-                  height: 100,
-                ),
-                Align(
-                    alignment: Alignment.topRight,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          "അടയ്ക്കേണ്ട തുക",
-                          style: TextStyle(fontFamily: "Mal", fontSize: 20),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          Constants.currency + " " + totalCost.toString(),
-                          textAlign: TextAlign.right,
-                          style: GoogleFonts.openSans(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  Align(
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "അടയ്ക്കേണ്ട തുക",
+                            style: TextStyle(fontFamily: "Mal"),
                           ),
-                        ),
-                      ],
-                    ))
-              ],
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            Constants.currency + " " + totalCost.toString(),
+                            textAlign: TextAlign.left,
+                            style: GoogleFonts.openSans(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ))
+                ],
+              ),
             ),
           ),
         ),
@@ -270,7 +371,6 @@ class _OrderScreenState extends State<OrderScreen> {
                         'ഉൽപ്പന്നങ്ങൾ',
                         style: TextStyle(
                           fontFamily: "Mal",
-                          fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -355,7 +455,9 @@ class _OrderScreenState extends State<OrderScreen> {
         },
         child: const Text(
           "ഉൽപ്പന്നം ചേർക്കുക",
-          style: TextStyle(fontFamily: "Mal", fontSize: 20),
+          style: TextStyle(
+            fontFamily: "Mal",
+          ),
         ),
       ),
     );

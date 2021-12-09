@@ -16,6 +16,7 @@ class OrderRepository {
   Future<String> createOrderAndPrintReceipt(Order order) async {
     try {
       final result = await dio.post(orderUrl, data: order);
+      print(result);
     } catch (e) {
       if (e is DioError) {
         return e.response!.data["message"];
