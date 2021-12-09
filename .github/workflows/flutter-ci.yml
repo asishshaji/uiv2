@@ -4,14 +4,16 @@ on: [push, pull_request]
 
 jobs:
   windows:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@v1.1
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
         with:
           channel: beta
-      - run: flutter config --enable-windows-desktop
-      - run: flutter build windows
+      - run: flutter config --enable-linux-desktop
+      - run: flutter build linux --no-sound-null-safety
 
   # windows:
   #   runs-on: windows-latest
