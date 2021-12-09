@@ -11,14 +11,14 @@ jobs:
         with:
           channel: beta
       - run: flutter config --enable-linux-desktop
-      - run: flutter build linux
+      - run: flutter build linux --no-sound-null-safety
 
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: beta
-      - run: flutter config --enable-windows-desktop
-      - run: flutter build windows
+  # windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: subosito/flutter-action@v1
+  #       with:
+  #         channel: beta
+  #     - run: flutter config --enable-windows-desktop
+  #     - run: flutter build windows --no-sound-null-safety
