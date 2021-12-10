@@ -29,4 +29,16 @@ class ProductRepository {
       throw Exception(err);
     }
   }
+
+  Future<void> deleteProduct(int id) async {
+    print(id);
+
+    try {
+      await dio.delete(
+        "http://0.0.0.0:9090/product/" + id.toString(),
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
 }

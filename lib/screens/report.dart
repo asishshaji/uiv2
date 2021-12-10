@@ -63,14 +63,14 @@ class _ReportScreenState extends State<ReportScreen> {
                   ),
                   SizedBox(
                     height: 350,
-                    width: 350,
+                    width: 280,
                     child: SfDateRangePicker(
                       onSelectionChanged: _onSelectionChanged,
                       selectionMode: DateRangePickerSelectionMode.range,
                     ),
                   ),
                   const SizedBox(
-                    width: 100,
+                    width: 10,
                   ),
                   Expanded(
                     child: Row(

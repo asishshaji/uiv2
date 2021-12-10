@@ -89,15 +89,18 @@ class _StockScreenState extends State<StockScreen> {
                   p.sell_price = 0;
                   p.type = "P";
                   p.units = 0;
-                  Navigator.of(context).push(
+                  Navigator.of(context)
+                      .push(
                     MaterialPageRoute(
-                      builder: (context) => CreateUpdateDialog(
+                      builder: (context) => CUDialog(
                         product: p,
                         create: true,
                       ),
                     ),
-                  );
-                  getProducts();
+                  )
+                      .then((value) {
+                    getProducts();
+                  });
                 },
                 child: const Text(
                   "ഉൽപ്പന്നം ചേർക്കുക",
@@ -122,24 +125,39 @@ class _StockScreenState extends State<StockScreen> {
                             itemCount: searchResultProducts.length,
                             itemBuilder: (context, i) {
                               return ListTile(
-                                trailing: IconButton(
-                                  iconSize: 18,
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CreateUpdateDialog(
-                                          product: searchResultProducts[i],
-                                          create: false,
-                                        ),
+                                trailing: Row(
+                                  children: [
+                                    IconButton(
+                                      iconSize: 18,
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => CUDialog(
+                                              product: searchResultProducts[i],
+                                              create: false,
+                                            ),
+                                          ),
+                                        );
+                                        getProducts();
+                                      },
+                                      icon: const Icon(
+                                        FontAwesomeIcons.edit,
+                                        color: Colors.black,
                                       ),
-                                    );
-                                    getProducts();
-                                  },
-                                  icon: const Icon(
-                                    FontAwesomeIcons.edit,
-                                    color: Colors.black,
-                                  ),
+                                    ),
+                                    IconButton(
+                                      iconSize: 18,
+                                      onPressed: () async {
+                                        await productRepository.deleteProduct(
+                                            searchResultProducts[i].id!);
+                                        getProducts();
+                                      },
+                                      icon: const Icon(
+                                        FontAwesomeIcons.trash,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 title: Text(
                                   searchResultProducts[i].name.toString(),
@@ -168,23 +186,41 @@ class _StockScreenState extends State<StockScreen> {
                             itemCount: products.length,
                             itemBuilder: (context, i) {
                               return ListTile(
-                                trailing: IconButton(
-                                  iconSize: 18,
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CreateUpdateDialog(
-                                          product: products[i],
-                                          create: false,
+                                trailing: SizedBox(
+                                  width: 80,
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        iconSize: 18,
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => CUDialog(
+                                                product: products[i],
+                                                create: false,
+                                              ),
+                                            ),
+                                          );
+                                          getProducts();
+                                        },
+                                        icon: const Icon(
+                                          FontAwesomeIcons.edit,
+                                          color: Colors.black,
                                         ),
                                       ),
-                                    );
-                                    getProducts();
-                                  },
-                                  icon: const Icon(
-                                    FontAwesomeIcons.edit,
-                                    color: Colors.black,
+                                      IconButton(
+                                        iconSize: 18,
+                                        onPressed: () async {
+                                          await productRepository
+                                              .deleteProduct(products[i].id!);
+                                          getProducts();
+                                        },
+                                        icon: const Icon(
+                                          FontAwesomeIcons.trash,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 title: Text(
