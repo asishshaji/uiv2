@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:uiv2/constants.dart';
@@ -42,7 +43,8 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
+    final DateFormat formatter = DateFormat('MMMEd');
+    final DateFormat timeFormat = DateFormat.jm();
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -140,6 +142,12 @@ class _ReportScreenState extends State<ReportScreen> {
                                       fontFamily: "Mal",
                                       fontWeight: FontWeight.bold))),
                           DataColumn(
+                              label: Text(
+                            "വാങ്ങിയ സമയം ",
+                            style: TextStyle(
+                                fontFamily: "Mal", fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
                               label: Text("ലാഭം",
                                   style: TextStyle(
                                       fontFamily: "Mal",
@@ -152,6 +160,28 @@ class _ReportScreenState extends State<ReportScreen> {
                                   ),
                                   DataCell(
                                     Text(e.phone_number.toString()),
+                                  ),
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        Text(
+                                          formatter.format(
+                                              DateTime.parse(e.created_at)),
+                                          style: GoogleFonts.openSans(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const Text(", "),
+                                        Text(
+                                          timeFormat.format(
+                                              DateTime.parse(e.created_at)
+                                                  .toLocal()),
+                                          style: GoogleFonts.openSans(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   DataCell(
                                     Text(Constants.currency +

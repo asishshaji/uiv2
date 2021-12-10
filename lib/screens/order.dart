@@ -179,7 +179,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       SizedBox(
-                        width: screenWidth / 5,
+                        width: screenWidth / 6,
                         child: const Text(
                           "ഐഡി",
                           textAlign: TextAlign.center,
@@ -191,7 +191,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: screenWidth / 5,
+                        width: screenWidth / 6,
                         child: const Text(
                           "ഉൽപ്പന്നം",
                           textAlign: TextAlign.center,
@@ -203,7 +203,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: screenWidth / 5,
+                        width: screenWidth / 6,
                         child: const Text(
                           "വില",
                           textAlign: TextAlign.center,
@@ -215,7 +215,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: screenWidth / 5,
+                        width: screenWidth / 6,
                         child: const Text(
                           "യൂണിറ്റുകൾ",
                           textAlign: TextAlign.center,
@@ -247,7 +247,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   e.id.toString(),
                                   textAlign: TextAlign.center,
                                 ),
-                                width: screenWidth / 5,
+                                width: screenWidth / 6,
                               ),
                               SizedBox(
                                 child: Text(
@@ -259,10 +259,10 @@ class _OrderScreenState extends State<OrderScreen> {
                                       ")",
                                   textAlign: TextAlign.center,
                                 ),
-                                width: screenWidth / 5,
+                                width: screenWidth / 6,
                               ),
                               SizedBox(
-                                width: screenWidth / 5,
+                                width: screenWidth / 6,
                                 child: Text(
                                   Constants.currency +
                                       " " +
@@ -271,7 +271,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                 ),
                               ),
                               SizedBox(
-                                width: screenWidth / 5,
+                                width: screenWidth / 6,
                                 child: TextFormField(
                                   textAlign: TextAlign.center,
                                   initialValue: initialVal.toString(),
@@ -410,9 +410,17 @@ class _OrderScreenState extends State<OrderScreen> {
                                     itemCount: searchResultProducts.length,
                                     itemBuilder: (context, i) {
                                       return ListTile(
-                                          title: Text(searchResultProducts[i]
-                                              .name
-                                              .toString()),
+                                          trailing: selectedProducts.contains(
+                                                  searchResultProducts[i])
+                                              ? const Icon(
+                                                  FontAwesomeIcons.checkCircle,
+                                                  color: Colors.green)
+                                              : null,
+                                          title: Text(
+                                            searchResultProducts[i]
+                                                .name
+                                                .toString(),
+                                          ),
                                           subtitle: Text(searchResultProducts[i]
                                               .units
                                               .toString()),
@@ -431,6 +439,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                     itemCount: products.length,
                                     itemBuilder: (context, i) {
                                       return ListTile(
+                                          trailing: selectedProducts
+                                                  .contains(products[i])
+                                              ? const Icon(
+                                                  FontAwesomeIcons.checkCircle,
+                                                  color: Colors.green)
+                                              : null,
                                           title: Text(
                                             products[i].name.toString(),
                                           ),
@@ -445,7 +459,27 @@ class _OrderScreenState extends State<OrderScreen> {
                                             setState(() {});
                                           });
                                     }),
-                          )
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                      Colors.black,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Close",
+                                    style: GoogleFonts.openSans(
+                                        color: Colors.white),
+                                  )),
+                            ),
+                          ),
                         ],
                       ),
                     ),
