@@ -7,10 +7,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
-  // windowManager.waitUntilReadyToShow().then((_) async {
-  //   windowManager.show();
-  //   await windowManager.setFullScreen(true);
-  // });
+  windowManager.waitUntilReadyToShow().then((_) async {
+    windowManager.show();
+    await windowManager.setFullScreen(true);
+  });
   runApp(
     const ProviderScope(
       child: MaterialApp(
