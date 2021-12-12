@@ -6,6 +6,7 @@ import 'package:uiv2/models/order.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:uiv2/models/orderPreview.dart';
 import 'package:uiv2/models/orderitem.dart';
 import 'package:uiv2/models/product.dart';
 
@@ -24,6 +25,21 @@ class OrderRepository {
     }
 
     return "";
+  }
+
+  Future<List<OrderPreview>> getOrderDetailsById(int id) async {
+    try {
+      final result = await dio.get(orderUrl + "/" + id.toString());
+
+      List<OrderPreview> orderPreviews = [];
+      for (dynamic d in result.data["message"]) {
+        orderPreviews.add(OrderPreview.fromJson(d));
+      }
+
+      return orderPreviews;
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   Future<void> printReceipt(String phoneNumber, List<Product> selectedProducts,

@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:uiv2/constants.dart';
 import 'package:uiv2/models/dashboard.dart';
+import 'package:uiv2/models/orderPreview.dart';
 import 'package:uiv2/models/recentorders.dart';
 import 'package:uiv2/repositories/dashboard_repo.dart';
+import 'package:uiv2/repositories/order_repo.dart';
 import 'package:uiv2/widgets/dashboard_card.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -21,8 +23,10 @@ class _ReportScreenState extends State<ReportScreen> {
   DateTime? endDate;
 
   DashboardRepository dashboardRepository = DashboardRepository();
+  OrderRepository orderRepository = OrderRepository();
   Dashboard? dashboard;
   List<RecentOrder> recentOrders = [];
+  List<OrderPreview> orderPreview = [];
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
     startDate = args.value.startDate;
@@ -129,6 +133,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   : Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 100),
                       child: DataTable(
+                        showCheckboxColumn: false,
                         columns: const [
                           DataColumn(
                               label: Text(
@@ -154,7 +159,95 @@ class _ReportScreenState extends State<ReportScreen> {
                                       fontWeight: FontWeight.bold))),
                         ],
                         rows: recentOrders
-                            .map((e) => DataRow(cells: [
+                            .map(
+                              (e) => DataRow(
+                                onSelectChanged: (_) async {
+                                  orderPreview = await orderRepository
+                                      .getOrderDetailsById(e.order_id);
+                                  showDialog(
+                                      context: context,
+                                      builder: (ctx) {
+                                        return AlertDialog(
+                                          actions: <Widget>[
+                                            TextButton(
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all(
+                                                  Colors.black,
+                                                ),
+                                              ),
+                                              child: Text('Close',
+                                                  style: GoogleFonts.openSans(
+                                                      color: Colors.white)),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                          title: const Center(
+                                            child: Text(
+                                              "സംഗ്രഹം",
+                                              style: TextStyle(
+                                                  fontFamily: "Mal",
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          content: DataTable(
+                                            columns: const [
+                                              DataColumn(
+                                                  label: Text(
+                                                "പേര്",
+                                                style: TextStyle(
+                                                    fontFamily: "Mal",
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                              DataColumn(
+                                                  label: Text(
+                                                "യൂണിറ്റുകൾ",
+                                                style: TextStyle(
+                                                    fontFamily: "Mal",
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                              DataColumn(
+                                                  label: Text(
+                                                "ചെലവ്",
+                                                style: TextStyle(
+                                                    fontFamily: "Mal",
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                              DataColumn(
+                                                  label: Text(
+                                                "ലാഭം",
+                                                style: TextStyle(
+                                                    fontFamily: "Mal",
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                            ],
+                                            rows: orderPreview
+                                                .map((q) => DataRow(cells: [
+                                                      DataCell(
+                                                          Text(q.product_name)),
+                                                      DataCell(
+                                                          Text(q.units_bought)),
+                                                      DataCell(Text(
+                                                          Constants.currency +
+                                                              " " +
+                                                              q.cost)),
+                                                      DataCell(Text(
+                                                          Constants.currency +
+                                                              " " +
+                                                              q.profit)),
+                                                    ]))
+                                                .toList(),
+                                          ),
+                                        );
+                                      });
+                                },
+                                cells: [
                                   DataCell(
                                     Text(e.order_id.toString()),
                                   ),
@@ -188,7 +281,9 @@ class _ReportScreenState extends State<ReportScreen> {
                                         " " +
                                         e.profit.toString()),
                                   ),
-                                ]))
+                                ],
+                              ),
+                            )
                             .toList(),
                       ),
                     ),
